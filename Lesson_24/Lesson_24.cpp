@@ -110,7 +110,10 @@ public:
 
 
 	void SetItems(string item_inside) {
-		if (item_inside != "fork" && !item_inside.empty()) { // Later on can check if item_input properties doesn't have "metal" in it.
+		if (item_inside != "fork" && !item_inside.empty()) { // Later on can check if item_input properties doesn't have "metal" in it. Optionally can add && !(item_inside.size() > 50)
+			if (item_inside.size() > 50) {
+				throw "Было переданно неверное значение в параметр item_input. Ожидается строка не больше 50 символов.";
+			}
 			this->item_inside = item_inside;
 		}
 		else {
