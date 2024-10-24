@@ -1,4 +1,6 @@
 ﻿#include <iostream>
+#include <string>
+#include <Windows.h>
 using namespace std;
 
 // Инкапсуляция собрала воедино 3 переменных и 2 метода
@@ -71,17 +73,17 @@ class Microwave {
 private:
 	bool has_power = true;
 	string item_inside;
-	unsigned short timer_seconds; // Seconds. Min: 10 Max: 1000
+	unsigned short timer_seconds = 0; // Seconds. Min: 10 Max: 1000
 	bool button_start = false; // False - regular button position. True - Microwave checks for closed door, starts working until timer is 0.
 	// bool door_status = false; // False - closed door. True - opened door.
 public:
 
-	void SetHasPower(bool has_power_input) {
-		if (has_power_input == true) {
-			has_power = true;
+	void SetHasPower(bool has_power) {
+		if (has_power == true) {
+			this->has_power = true;
 		}
-		else if (has_power_input == false) {
-			has_power = false;
+		else if (has_power == false) {
+			this->has_power = false;
 		}
 		else {
 			throw "Было переданно неверное значение в параметр button_start_input. Ожидается true/false.";
@@ -93,9 +95,9 @@ public:
 	}
 
 
-	void SetTimer(unsigned short timer_input) {
-		if (has_power == true && timer_input >= 10 && timer_input <= 1000) {
-			timer_seconds = timer_input;
+	void SetTimer(unsigned short timer_seconds) {
+		if (has_power == true && timer_seconds >= 10 && timer_seconds <= 1000) {
+			this->timer_seconds = timer_seconds;
 		}
 		else {
 			throw "Было переданно неверное значение в параметр timer_input. Ожидается целое число в диапазоне от 10 до 1000 включительно";
@@ -107,12 +109,12 @@ public:
 	}
 
 
-	void SetItems(string item_input) {
-		if (item_input != "fork") { // Later on can check if item_input properties doesn't have "metal" in it.
-			item_inside = item_input;
+	void SetItems(string item_inside) {
+		if (item_inside != "fork" && !item_inside.empty()) { // Later on can check if item_input properties doesn't have "metal" in it.
+			this->item_inside = item_inside;
 		}
 		else {
-			throw "Было переданно неверное значение в параметр item_input. Ожидается не-металличский предмет.";
+			throw "Было переданно неверное значение в параметр item_input. Ожидается не-металличский предмет / непустая строка.";
 		}
 	}
 
@@ -121,17 +123,19 @@ public:
 	}
 
 
-	void SetButtonStart(bool button_start_input) {
-		if (has_power == true && button_start_input == true) {
-			button_start = true;
+	void SetButtonStart(bool button_start) {
+		if (has_power == true && button_start == 1) {
+			this->button_start = true;
 			// Microwave starts working function call here.
 			// After that, button_start = false; automatically
+			MicrowaveWorking();
+			button_start = false;
 		}
 		/*else if (button_start_input == false) {
 			button_start = false;
 		}*/
 		else {
-			throw "Было переданно неверное значение в параметр button_start_input. Ожидается true.";
+			throw "Было переданно неверное значение в параметр button_start_input. Ожидается 1 (true).";
 		}
 	}
 
@@ -140,7 +144,25 @@ public:
 	}
 
 
-	// TODO: MicrowaveWorking function with return error_code;
+	// TODO: MicrowaveWorking function with exeption generation
+
+	void MicrowaveWorking() {
+		if (true) { // Set to true because of Setter not allowing empty strings. Check if item_inside string is not empty !item_inside.empty()
+			cout << "Microwave starts cooking " << item_inside << "..." << "\n";
+			for (short i = 0; i < timer_seconds; i++)
+			{
+				cout << "BZZZZ..." << "\n";
+				Sleep(1000);
+			}
+			cout << "Microwave stops working. " << item_inside << " is finished cooking." << "\n";
+		}
+		else {
+			throw "Было передано неверное значение в параметр item_inside. Ожидается непустая строка.";
+		}
+		timer_seconds = 0;
+		// item_inside = ""; // Optional
+	}
+
 };
 
 
@@ -267,11 +289,15 @@ int main()
 	
 	Student test;
 	Student* test_ptr = &test;
-	test.SetStudentName("Oleg olegivich dada");
+	test.SetStudentName("Oleg olegivich");
 	test.SetLeader(test_ptr);
 	test.PrintStudent();
 
-
+	Microwave test2;
+	test2.SetHasPower(true);
+	test2.SetTimer(10);
+	test2.SetItems("Tasty meal");
+	test2.SetButtonStart(true);
 	// test.date_join.
 	// В таком случае пользователь может сам выставить параметры даты.
 	// А нам это может быть НЕ НУЖНО. Вдруг он выставит другую дату, ниже предыдущей?
