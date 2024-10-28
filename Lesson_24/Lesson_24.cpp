@@ -8,11 +8,34 @@ using namespace std;
 
 class Date {
 private: // Закрываем поля, так как если они будут публичными, то клиент (пользователь класса (другой программист)) сможет передать неверные значения
-	unsigned int day = 1; // Правила: Значения в диапазоне от 1-31
-	unsigned int month = 1; // 1-12
+	unsigned short day = 1; // Правила: Значения в диапазоне от 1-31
+	unsigned short month = 1; // 1-12
 	int year = 2024;
 public:
-	void SetDay(unsigned int d) {
+	/// <summary>
+	/// Empty constructor. Uses Windows API to get current day, month, year to initialize the variable.
+	/// </summary>
+	Date() {
+		SYSTEMTIME st;
+		GetSystemTime(&st);
+		day = st.wDay;
+		month = st.wMonth;
+		year = st.wYear;
+	}
+
+	/// <summary>
+	/// Main constructor. Uses Setters to set day, month and year.
+	/// </summary>
+	/// <param name="day">Value between 1 and 31</param>
+	/// <param name="month">Value between 1 and 12</param>
+	/// <param name="year">Any given INT value</param>
+	Date(unsigned short day, unsigned short month, int year) {
+		SetDay(day);
+		SetMonth(month);
+		SetYear(year);
+	}
+
+	void SetDay(unsigned short d) {
 		if (d >= 1 && d <= 31) {
 			day = d;
 		}
@@ -21,12 +44,12 @@ public:
 		}
 	}
 	// Все поля будут считаться константными
-	unsigned int GetDay() const {
+	unsigned short GetDay() const {
 		return day;
 	}
 
 
-	void SetMonth(unsigned int m) {
+	void SetMonth(unsigned short m) {
 		if (m >= 1 && m <= 12) {
 			month = m;
 			// TODO: Add option for user to input 13 as a month number (or anything in custom range), then calculate how many months is that (input - 12)
@@ -41,7 +64,7 @@ public:
 		}
 	}
 
-	unsigned int GetMonth() const {
+	unsigned short GetMonth() const {
 		return month;
 	}
 
@@ -56,10 +79,17 @@ public:
 
 
 	// Temp function
-	void SetDate(unsigned int d, unsigned int m, int y) {
-		SetDay(d);
-		SetMonth(m);
-		SetYear(y);
+	
+	/// <summary>
+	/// Setter for day, month, year. Uses 3 Setters for values.
+	/// </summary>
+	/// <param name="day">Value between 1 and 31</param>
+	/// <param name="month">Value between 1 and 12</param>
+	/// <param name="year">Any given INT value</param>
+	void SetDate(unsigned short day, unsigned short month, int year) {
+		SetDay(day);
+		SetMonth(month);
+		SetYear(year);
 	}
 
 	void PrintDate() const {
@@ -78,6 +108,29 @@ private:
 	// bool door_status = false; // False - closed door. True - opened door.
 public:
 
+	/*
+	Microwave() {
+		SetHasPower(false);
+		SetItems("");
+		SetTimer(10);
+		SetButtonStart(false);
+	}
+	*/
+	
+
+	Microwave(bool has_power = false, string item_inside = "empty", unsigned short timer_seconds = 0, bool button_start = false) {
+		SetHasPower(has_power);
+		SetItems(item_inside);
+		if (has_power == true) SetTimer(timer_seconds);
+		else timer_seconds = 0;
+		if (button_start == true) SetButtonStart(button_start);
+		else button_start = false;
+	}
+
+	/// <summary>
+	/// Setter for has_power (bool) value. Throws exception.
+	/// </summary>
+	/// <param name="has_power">bool value. Accepts true or false.</param>
 	void SetHasPower(bool has_power) {
 		if (has_power == true) {
 			this->has_power = true;
@@ -95,6 +148,10 @@ public:
 	}
 
 
+	/// <summary>
+	/// Setter for timer_seconds value. Accepts values between 10 and 1000, and if has_power == true. Throws exception.
+	/// </summary>
+	/// <param name="timer_seconds">unsigned short value between 10 and 1000.</param>
 	void SetTimer(unsigned short timer_seconds) {
 		if (has_power == true && timer_seconds >= 10 && timer_seconds <= 1000) {
 			this->timer_seconds = timer_seconds;
@@ -108,7 +165,10 @@ public:
 		return timer_seconds;
 	}
 
-
+	/// <summary>
+	/// Setter for item_inside (string) value. Doesn't accept empty strings and string that are longer then 50 charachters (not including symbol with code 0).
+	/// </summary>
+	/// <param name="item_inside">String value.</param>
 	void SetItems(string item_inside) {
 		if (item_inside != "fork" && !item_inside.empty()) { // Later on can check if item_input properties doesn't have "metal" in it. Optionally can add && !(item_inside.size() > 50)
 			if (item_inside.size() > 50) {
@@ -125,7 +185,10 @@ public:
 		return item_inside;
 	}
 
-
+	/// <summary>
+	/// Function to "start" the microwave. Checks if Microwave has power and input value is 1 (exception otherwise). After Microwave finishes "working", sets button_start to 0.
+	/// </summary>
+	/// <param name="button_start">bool value for starting the microwave. Accepts 1, exception otherwise.</param>
 	void SetButtonStart(bool button_start) {
 		if (has_power == true && button_start == 1) {
 			this->button_start = true;
@@ -138,7 +201,7 @@ public:
 			button_start = false;
 		}*/
 		else {
-			throw "Было переданно неверное значение в параметр button_start_input. Ожидается 1 (true).";
+			throw "Было переданно неверное значение в параметр button_start. Ожидается 1 (true) и параметр has_power == true.";
 		}
 	}
 
@@ -146,9 +209,9 @@ public:
 		return button_start;
 	}
 
-
-	// TODO: MicrowaveWorking function with exeption generation
-
+	/// <summary>
+	/// Function "starts" the Microwave, working for amount of seconds specified in timer_seconds value. Sets timer_seconds to 0 after finished "working".
+	/// </summary>
 	void MicrowaveWorking() {
 		if (true) { // Set to true because of Setter not allowing empty strings. Check if item_inside string is not empty !item_inside.empty()
 			cout << "Microwave starts cooking " << item_inside << "..." << "\n";
@@ -165,7 +228,6 @@ public:
 		timer_seconds = 0;
 		// item_inside = ""; // Optional
 	}
-
 };
 
 
@@ -180,6 +242,17 @@ private:
 	Date date_join;
 public:
 	// Date date_join;
+
+	Student(Student* leader = nullptr, bool is_member = true, string student_name = "none", string learning_program = "none", unsigned int student_balance = 0, unsigned int cost_per_month = 0) {
+		if (leader != nullptr) SetLeader(leader);
+		else leader = nullptr;
+		SetIsMember(is_member);
+		SetStudentName(student_name);
+		SetLearningProgram(learning_program);
+		SetStudentBalance(student_balance);
+		SetCostPerMonth(cost_per_month);
+	}
+
 
 	void SetLeader(Student* leader) {
 		if (leader != nullptr) {
@@ -287,20 +360,27 @@ int main()
 {
 	setlocale(0, "");
 	Date today;
+	today.PrintDate();
 	today.SetDate(21, 10, 2024);
 	today.PrintDate();
 	
 	Student test;
+	/*
 	Student* test_ptr = &test;
 	test.SetStudentName("Oleg olegivich");
 	test.SetLeader(test_ptr);
 	test.PrintStudent();
+	*/
+	
 
 	Microwave test2;
+	/*
 	test2.SetHasPower(true);
 	test2.SetTimer(10);
 	test2.SetItems("Tasty meal");
 	test2.SetButtonStart(true);
+	*/
+	
 	// test.date_join.
 	// В таком случае пользователь может сам выставить параметры даты.
 	// А нам это может быть НЕ НУЖНО. Вдруг он выставит другую дату, ниже предыдущей?
