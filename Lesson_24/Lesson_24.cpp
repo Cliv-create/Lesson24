@@ -1,6 +1,7 @@
 ﻿#include <iostream>
 #include <string>
 #include <Windows.h>
+#include <vector>
 using namespace std;
 
 // Инкапсуляция собрала воедино 3 переменных и 2 метода
@@ -118,13 +119,19 @@ public:
 	*/
 	
 
-	Microwave(bool has_power = false, string item_inside = "empty", unsigned short timer_seconds = 0, bool button_start = false) {
+	Microwave(bool has_power = false, string item_inside = "empty", unsigned short timer_seconds = 10, bool button_start = false) {
 		SetHasPower(has_power);
 		SetItems(item_inside);
+		// timer_seconds = 0;
+		// SetTimer(timer_seconds);
+		// SetButtonStart(button_start);
+		
 		if (has_power == true) SetTimer(timer_seconds);
 		else timer_seconds = 0;
 		if (button_start == true) SetButtonStart(button_start);
 		else button_start = false;
+		
+		
 	}
 
 	/// <summary>
@@ -233,6 +240,8 @@ public:
 
 class Student {
 private:
+	int* rates = nullptr;
+	int rates_count = 0;
 	Student* leader = nullptr;
 	bool is_member = true;
 	string student_name;
@@ -242,6 +251,21 @@ private:
 	Date date_join;
 public:
 	// Date date_join;
+
+	/*
+	
+	Student() : Student(nullptr, true, "none", "none", 0, 0) { }
+	
+	Student(Student* leader, bool is_member, string student_name, string learning_program, unsigned int student_balance, unsigned int cost_per_month) {
+		if (leader != nullptr) SetLeader(leader);
+		else leader = nullptr;
+		SetIsMember(is_member);
+		SetStudentName(student_name);
+		SetLearningProgram(learning_program);
+		SetStudentBalance(student_balance);
+		SetCostPerMonth(cost_per_month);
+	}
+	*/
 
 	Student(Student* leader = nullptr, bool is_member = true, string student_name = "none", string learning_program = "none", unsigned int student_balance = 0, unsigned int cost_per_month = 0) {
 		if (leader != nullptr) SetLeader(leader);
@@ -254,19 +278,55 @@ public:
 	}
 
 
-	void SetLeader(Student* leader) {
-		if (leader != nullptr) {
-			// TODO: Add more ptr checks.
-			this->leader = leader;
+	void AddRate(int rate) {
+		if (rate < 1 || rate > 12) throw "Incorrect value (1-12 expected).";
+		if (rates_count == 0) {
+			rates = new int[1];
+			rates[0] = rate;
 		}
 		else {
-			throw "Было переданно неверное значение в параметр leader_input. Ожидается корректный, непустой указатель.";
+			int* temp = new int[rates_count + 1];
+			for (int i = 0; i < rates_count; i++)
+				temp[i] = rates[i];
+			temp[rates_count] = rate;
+			delete[] rates;
+			rates = temp;
 		}
+		rates_count++;
+	}
+
+	vector<int> GetRates() const {
+		vector<int> temp;
+		for (int i = 0; i < rates_count; i++)
+		{
+			temp.push_back(rates[i]);
+		}
+		return temp;
+	}
+
+	int GetRateByIndex(unsigned int index) {
+		if (index >= rates_count) throw "Incorrect index!\n";
+		return rates[index];
+	}
+
+
+	void SetLeader(Student* leader) {
+		/*
+		if (Student* student = dynamic_cast<Student*>(leader)) {
+			cout << "студент либо его потомок";
+		}
+		else {
+			cout << "что-то другое по типу";
+		}
+		*/
+
+		this->leader = leader;
 	}
 
 	Student* GetLeader() const {
 		return leader;
 	}
+
 
 	void SetIsMember(bool is_member) {
 		if (is_member == 1 || is_member == 0) {
@@ -281,21 +341,34 @@ public:
 		return is_member;
 	}
 
+
 	void SetStudentName(string student_name) {
-		this->student_name = student_name; // TODO - Add more checks to setter.
+		if (!student_name.empty()) {
+			this->student_name = student_name; // TODO - Add more checks to setter.
+		}
+		else {
+			throw "Было переданно неверное значение в параметр student_name. Ожидается непустая строка.";
+		}
 	}
 
 	string GetStudentName() const {
 		return student_name;
 	}
 
+
 	void SetLearningProgram(string learning_program) {
-		this->learning_program = learning_program; // TODO - Add more checks to setter.
+		if (!learning_program.empty()) {
+			this->learning_program = learning_program; // TODO - Add more checks to setter.
+		}
+		else {
+			throw "Было переданно неверное значение в параметр learning_program. Ожидается непустая строка.";
+		}
 	}
 
 	string GetLearningProgram() const {
 		return learning_program;
 	}
+
 
 	/// <summary>
 	/// Setter for student_balance variable. Generates exception if is_member == false / input value is not >= 0.
@@ -318,6 +391,10 @@ public:
 		return student_balance;
 	}
 
+
+
+
+
 	/// <summary>
 	/// Setter for cost_per_month variable. Generates exception if is_member == false / input value is not >= 0.
 	/// </summary>
@@ -339,6 +416,7 @@ public:
 		return cost_per_month;
 	}
 
+
 	void PrintStudent() const {
 		cout << boolalpha; // Printing true / false
 		cout << "\n" << "\"" << student_name << "\"" << " student information" << "\n";
@@ -351,7 +429,24 @@ public:
 		cout << noboolalpha; // Printing 1 / 0
 	}
 
+
 	// TODO: Add setter/getter from Date class. SetDate and Print functions.
+	
+	
+	~Student() {
+		/*
+		if (name != nullptr) {
+			delete[] name;
+			name = nullptr;
+		}
+		*/
+		if (rates != nullptr) {
+			delete[] rates;
+			rates = nullptr;
+		}
+	}
+	
+	
 
 };
 
