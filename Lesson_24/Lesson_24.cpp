@@ -252,9 +252,11 @@ private:
 public:
 	// Date date_join;
 
-	/*
+	
 	
 	Student() : Student(nullptr, true, "none", "none", 0, 0) { }
+
+	explicit Student(string name) : Student(nullptr, true, name, "none", 0, 0) { }
 	
 	Student(Student* leader, bool is_member, string student_name, string learning_program, unsigned int student_balance, unsigned int cost_per_month) {
 		if (leader != nullptr) SetLeader(leader);
@@ -265,8 +267,12 @@ public:
 		SetStudentBalance(student_balance);
 		SetCostPerMonth(cost_per_month);
 	}
-	*/
+	
 
+	
+	/*
+	// explicit Student(string name) : Student(name) { }
+	
 	Student(Student* leader = nullptr, bool is_member = true, string student_name = "none", string learning_program = "none", unsigned int student_balance = 0, unsigned int cost_per_month = 0) {
 		if (leader != nullptr) SetLeader(leader);
 		else leader = nullptr;
@@ -276,6 +282,8 @@ public:
 		SetStudentBalance(student_balance);
 		SetCostPerMonth(cost_per_month);
 	}
+	*/
+	
 
 
 	void AddRate(int rate) {
@@ -392,7 +400,38 @@ public:
 	}
 
 
+	/*
+	void AddBalanceEntry(int balance_entry) {
+		// if (balance_entry < 1 || rate > balance_entry) throw "Incorrect value (1-12 expected).";
+		if (balance_entry_count == 0) {
+			balance_entry = new int[1];
+			balance[0] = balance_entry;
+		}
+		else {
+			int* temp = new int[balance_entry_count + 1];
+			for (int i = 0; i < balance_entry_count; i++)
+				temp[i] = balance[i];
+			temp[balance_entry_count] = rate;
+			delete[] balance;
+			balance = temp;
+		}
+		balance_entry_count++;
+	}
 
+	vector<int> GetBalance() const {
+		vector<int> temp;
+		for (int i = 0; i < balance_entry_count; i++)
+		{
+			temp.push_back(balance[i]);
+		}
+		return temp;
+	}
+
+	int GetBalanceEntryByIndex(unsigned int index) {
+		if (index >= balance_entry_count) throw "Incorrect index!\n";
+		return balance[index];
+	}
+	*/
 
 
 	/// <summary>
