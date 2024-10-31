@@ -240,8 +240,11 @@ public:
 
 class Student {
 private:
+	static int students_count;
 	int* rates = nullptr;
 	int rates_count = 0;
+	int* balance = 0;
+	int balance_count = 0;
 	Student* leader = nullptr;
 	bool is_member = true;
 	string student_name;
@@ -249,15 +252,16 @@ private:
 	unsigned int student_balance = 0;
 	unsigned int cost_per_month = 0;
 	Date date_join;
+	Date date_leave;
 public:
-	// Date date_join;
-
-	
 	
 	Student() : Student(nullptr, true, "none", "none", 0, 0) { }
 
 	explicit Student(string name) : Student(nullptr, true, name, "none", 0, 0) { }
+
+	explicit Student(string name, string learning_program) : Student(nullptr, true, name, learning_program, 0, 0) { }
 	
+	// Main c-tor
 	Student(Student* leader, bool is_member, string student_name, string learning_program, unsigned int student_balance, unsigned int cost_per_month) {
 		if (leader != nullptr) SetLeader(leader);
 		else leader = nullptr;
@@ -266,24 +270,27 @@ public:
 		SetLearningProgram(learning_program);
 		SetStudentBalance(student_balance);
 		SetCostPerMonth(cost_per_month);
+		students_count++;
 	}
 	
+	static int GetStudentsCount() {
+		return students_count;
+	}
 
-	
-	/*
-	// explicit Student(string name) : Student(name) { }
-	
-	Student(Student* leader = nullptr, bool is_member = true, string student_name = "none", string learning_program = "none", unsigned int student_balance = 0, unsigned int cost_per_month = 0) {
-		if (leader != nullptr) SetLeader(leader);
-		else leader = nullptr;
-		SetIsMember(is_member);
-		SetStudentName(student_name);
-		SetLearningProgram(learning_program);
-		SetStudentBalance(student_balance);
-		SetCostPerMonth(cost_per_month);
+	void SetDateJoin(const Date& date_join) {
+		this->date_join = date_join;
 	}
-	*/
-	
+	Date GetDateJoin() const {
+		return date_join;
+	}
+
+
+	void SetDateLeave(const Date& date_leave) {
+		this->date_leave = date_leave;
+	}
+	Date GetDateLeave() const {
+		return date_leave;
+	}
 
 
 	void AddRate(int rate) {
@@ -316,7 +323,7 @@ public:
 		if (index >= rates_count) throw "Incorrect index!\n";
 		return rates[index];
 	}
-
+	
 
 	void SetLeader(Student* leader) {
 		/*
@@ -463,7 +470,8 @@ public:
 		cout << "Is member: " << is_member << "\n";
 		cout << "Student balance: " << student_balance << "\t" << "Cost per-month: " << cost_per_month << "\n";
 		cout << "Student's learning program: " << learning_program << "\n";
-		cout << "Student's group leader: " << leader->GetStudentName() << "\n";
+		if (!(leader == nullptr)) cout << "Student's group leader: " << leader->GetStudentName() << "\n";
+		else cout << "Student's group leader: none" << "\n";
 		cout << "}" << "\n";
 		cout << noboolalpha; // Printing 1 / 0
 	}
@@ -483,11 +491,22 @@ public:
 			delete[] rates;
 			rates = nullptr;
 		}
+		students_count--;
 	}
 	
-	
+	Student(Student& original) {
+		for (int rate : original.GetRates()) {
+			/*this->*/AddRate(rate);
+		}
+		// TODO: Uncomment once balance dynamic array is used.
+		//for (int balance_entry : original.GetBalance()) {
+		//	/*this->*/AddBalanceEntry(balance_entry);
+		//}
+		students_count++;
+	}
 
 };
+int Student::students_count = 0;
 
 
 int main()
@@ -499,6 +518,16 @@ int main()
 	today.PrintDate();
 	
 	Student test;
+	// Student testleader;
+	// testleader.SetStudentName("Vlad");
+	// Student* ptrleader = &testleader;
+	// test.SetLeader(ptrleader);
+	test.PrintStudent();
+	/*
+	Student copy = test;
+	copy.PrintStudent();
+	*/
+	
 	/*
 	Student* test_ptr = &test;
 	test.SetStudentName("Oleg olegivich");
