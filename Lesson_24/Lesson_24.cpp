@@ -102,24 +102,19 @@ public:
 
 class Microwave {
 private:
+	static int microwave_count;
 	bool has_power = true;
 	string item_inside;
 	unsigned short timer_seconds = 0; // Seconds. Min: 10 Max: 1000
 	bool button_start = false; // False - regular button position. True - Microwave checks for closed door, starts working until timer is 0.
 	// bool door_status = false; // False - closed door. True - opened door.
 public:
+	Microwave() : Microwave(false, "empty", 10, false) { }
 
-	/*
-	Microwave() {
-		SetHasPower(false);
-		SetItems("");
-		SetTimer(10);
-		SetButtonStart(false);
-	}
-	*/
-	
+	explicit Microwave(string item_inside) : Microwave(false, item_inside, 10, false) { }
 
-	Microwave(bool has_power = false, string item_inside = "empty", unsigned short timer_seconds = 10, bool button_start = false) {
+	// false, "empty", 10, false
+	Microwave(bool has_power, string item_inside, unsigned short timer_seconds, bool button_start) {
 		SetHasPower(has_power);
 		SetItems(item_inside);
 		// timer_seconds = 0;
@@ -130,9 +125,18 @@ public:
 		else timer_seconds = 0;
 		if (button_start == true) SetButtonStart(button_start);
 		else button_start = false;
-		
-		
+		microwave_count++;
 	}
+
+
+	static int GetMicrowaveCount() {
+		return microwave_count;
+	}
+
+	~Microwave() {
+		microwave_count--;
+	}
+
 
 	/// <summary>
 	/// Setter for has_power (bool) value. Throws exception.
@@ -235,7 +239,17 @@ public:
 		timer_seconds = 0;
 		// item_inside = ""; // Optional
 	}
+
+	void PrintMicrowave() {
+		printf("\nMicrowave has power: %s\n", has_power ? "true" : "false");
+		// printf("Item inside: %s\n", item_inside); // Doesn't work
+		cout << "Item inside: " << item_inside << "\n";
+		printf("Timer in seconds: %i\n", timer_seconds);
+		printf("Microwave started: %s\n\n", button_start ? "true" : "false");
+	}
+
 };
+int Microwave::microwave_count = 0;
 
 
 class Student {
@@ -537,6 +551,8 @@ int main()
 	
 
 	Microwave test2;
+	test2.SetHasPower(true);
+	test2.PrintMicrowave();
 	/*
 	test2.SetHasPower(true);
 	test2.SetTimer(10);
