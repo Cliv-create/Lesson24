@@ -516,6 +516,13 @@ public:
 		//for (int balance_entry : original.GetBalance()) {
 		//	/*this->*/AddBalanceEntry(balance_entry);
 		//}
+		this->rates_count = original.rates_count;
+		this->balance_count = original.balance_count;
+		this->is_member = original.is_member;
+		this->student_name = original.student_name;
+		this->learning_program = original.learning_program;
+		this->student_balance = original.student_balance;
+		this->cost_per_month = original.cost_per_month;
 		students_count++;
 	}
 
