@@ -265,6 +265,15 @@ private:
 	string learning_program;
 	unsigned int student_balance = 0;
 	unsigned int cost_per_month = 0;
+
+	// TODO: Add average number variables.
+	int total_rates = 0; // All rates added together
+	int average_rate = 0; // Take total_rates and divide by rates_count. Result - averate_rate variable.
+	// Each time rate is added - re-calculate the rates.
+	// total_rates += rate;
+	// averate_rate = total_rates / rates_count
+	
+
 	Date date_join;
 	Date date_leave;
 public:
@@ -322,6 +331,12 @@ public:
 			rates = temp;
 		}
 		rates_count++;
+
+		// TODO: Test average rate counter
+		total_rates += rate;
+		average_rate = total_rates / rates_count;
+		
+
 	}
 
 	vector<int> GetRates() const {
@@ -338,6 +353,9 @@ public:
 		return rates[index];
 	}
 	
+	int GetStudentAverateRate() const {
+		return average_rate;
+	}
 
 	void SetLeader(Student* leader) {
 		/*
@@ -526,8 +544,29 @@ public:
 		students_count++;
 	}
 
+	bool operator > (/*const Fraction* this, */const Student& right) {
+		// this-> это как left. в глобальной функции
+		return (this->average_rate > right.average_rate);
+	}
+
+	bool operator < (/*const Fraction* this, */const Student& right) {
+		// this-> это как left. в глобальной функции
+		return !(this->average_rate > right.average_rate);
+	}
+
+	bool operator == (/*const Fraction* this, */const Student& right) {
+		// this-> это как left. в глобальной функции
+		return (this->average_rate == right.average_rate);
+	}
+
+	bool operator != (/*const Fraction* this, */const Student& right) {
+		// this-> это как left. в глобальной функции
+		return !(this->average_rate == right.average_rate);
+	}
+
 };
 int Student::students_count = 0;
+
 
 
 int main()
@@ -539,11 +578,33 @@ int main()
 	today.PrintDate();
 	
 	Student test;
+	Student test2;
 	// Student testleader;
 	// testleader.SetStudentName("Vlad");
 	// Student* ptrleader = &testleader;
 	// test.SetLeader(ptrleader);
-	test.PrintStudent();
+	// test.PrintStudent();
+	
+	test.AddRate(11);
+	int res = test.GetStudentAverateRate();
+	cout << "\n" << res << "\n";
+
+	test2.AddRate(12);
+	int res2 = test.GetStudentAverateRate();
+	cout << res2 << "\n";
+
+	if (test > test2) {
+		cout << "test > test2";
+	}
+	/*
+	else {
+		cout << "test < test2";
+	}
+	*/
+	if (test < test2) {
+		cout << "test < test2";
+	}
+
 	/*
 	Student copy = test;
 	copy.PrintStudent();
@@ -557,9 +618,9 @@ int main()
 	*/
 	
 
-	Microwave test2;
-	test2.SetHasPower(true);
-	test2.PrintMicrowave();
+	Microwave test3;
+	test3.SetHasPower(true);
+	test3.PrintMicrowave();
 	/*
 	test2.SetHasPower(true);
 	test2.SetTimer(10);
