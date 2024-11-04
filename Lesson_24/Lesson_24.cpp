@@ -36,6 +36,18 @@ public:
 		SetYear(year);
 	}
 
+
+	int operator - (/*const Fraction* this, */ Date& right) {
+		// this-> это как left. в глобальной функции
+		int JDN, JDN2, jdn_result;
+		// JDN = this->date
+		JDN = (1461 * (year + 4800 + (month - 14) / 12)) / 4 + (367 * (month - 2 - 12 * ((month - 14) / 12))) / 12 - (3 * ((year + 4900 + (month - 14) / 12) / 100)) / 4 + day - 32075;
+		JDN2 = (1461 * (right.year + 4800 + (right.month - 14) / 12)) / 4 + (367 * (right.month - 2 - 12 * ((right.month - 14) / 12))) / 12 - (3 * ((right.year + 4900 + (right.month - 14) / 12) / 100)) / 4 + right.day - 32075;
+		jdn_result = JDN - JDN2;
+		return jdn_result;
+	}
+
+
 	void SetDay(unsigned short d) {
 		if (d >= 1 && d <= 31) {
 			day = d;
@@ -99,6 +111,32 @@ public:
 
 };
 
+ostream& operator << (ostream& os, const Date& date);
+istream& operator >> (istream& is, Date& date);
+
+ostream& operator << (ostream& os, const Date& date)
+{
+	os << date.GetDay() << "/" << date.GetMonth() << "/" << date.GetYear();
+	return os;
+}
+
+istream& operator >> (istream& is, Date& date)
+{
+	int day, month, year;
+
+	cout << "Enter day: ";
+	is >> day;
+	cout << "Enter month: ";
+	is >> month;
+	cout << "Enter year: ";
+	is >> year;
+
+	date.SetDay(day);
+	date.SetMonth(month);
+	date.SetYear(year);
+
+	return is;
+}
 
 class Microwave {
 private:
@@ -251,6 +289,34 @@ public:
 };
 int Microwave::microwave_count = 0;
 
+ostream& operator << (ostream& os, const Microwave& microwave);
+istream& operator >> (istream& is, Microwave& microwave);
+
+ostream& operator << (ostream& os, const Microwave& microwave)
+{
+	os << "pw: " << microwave.GetHasPower() << " " << "t: " << microwave.GetTimer() << " " << "st: " << microwave.GetButtonStart() << " " << "in: " << microwave.GetItems();
+	return os;
+}
+
+istream& operator >> (istream& is, Microwave& microwave)
+{
+	bool has_power;
+	string item_inside;
+
+	cout << "Enter has_power: ";
+	is >> has_power;
+
+	cin.ignore();
+	cout << "Enter item_inside: ";
+	// is >> item_inside;
+	getline(cin, item_inside);
+	cin.ignore();
+
+	microwave.SetHasPower(has_power);
+	microwave.SetItems(item_inside);
+
+	return is;
+}
 
 class Student {
 private:
@@ -278,6 +344,9 @@ private:
 	Date date_leave;
 public:
 	
+	// //////////// //////////// //////////// ////////////
+	// Constructors / Destructors / Operator overload
+
 	Student() : Student(nullptr, true, "none", "none", 0, 0) { }
 
 	explicit Student(string name) : Student(nullptr, true, name, "none", 0, 0) { }
@@ -296,21 +365,151 @@ public:
 		students_count++;
 	}
 	
-	static int GetStudentsCount() {
-		return students_count;
+
+	~Student() {
+		/*
+		if (name != nullptr) {
+			delete[] name;
+			name = nullptr;
+		}
+		*/
+		if (rates != nullptr) {
+			delete[] rates;
+			rates = nullptr;
+		}
+		students_count--;
 	}
+
+	Student(Student& original) {
+		for (int rate : original.GetRates()) {
+			/*this->*/AddRate(rate);
+		}
+		// TODO: Uncomment once balance dynamic array is used.
+		//for (int balance_entry : original.GetBalance()) {
+		//	/*this->*/AddBalanceEntry(balance_entry);
+		//}
+		this->rates_count = original.rates_count;
+		this->balance_count = original.balance_count;
+		this->is_member = original.is_member;
+		this->student_name = original.student_name;
+		this->learning_program = original.learning_program;
+		this->student_balance = original.student_balance;
+		this->cost_per_month = original.cost_per_month;
+		students_count++;
+	}
+
+	bool operator > (/*const Fraction* this, */const Student& right) {
+		// this-> это как left. в глобальной функции
+		return (this->average_rate > right.average_rate);
+	}
+
+	bool operator < (/*const Fraction* this, */const Student& right) {
+		// this-> это как left. в глобальной функции
+		return !(this->average_rate > right.average_rate);
+	}
+
+	bool operator == (/*const Fraction* this, */const Student& right) {
+		// this-> это как left. в глобальной функции
+		return (this->average_rate == right.average_rate);
+	}
+
+	bool operator != (/*const Fraction* this, */const Student& right) {
+		// this-> это как left. в глобальной функции
+		return !(this->average_rate == right.average_rate);
+	}
+
+
+	// Constructors / Destructors / Operator overload
+	// /////// /////// /////// /////// /////// ///////
+	// Setters
 
 	void SetDateJoin(const Date& date_join) {
 		this->date_join = date_join;
+	}
+
+	void SetDateLeave(const Date& date_leave) {
+		this->date_leave = date_leave;
+	}
+
+	void SetLeader(Student* leader) {
+		/*
+		if (Student* student = dynamic_cast<Student*>(leader)) {
+			cout << "студент либо его потомок";
+		}
+		else {
+			cout << "что-то другое по типу";
+		}
+		*/
+
+		this->leader = leader;
+	}
+
+	void SetIsMember(bool is_member) {
+		if (is_member == 1 || is_member == 0) {
+			this->is_member = is_member;
+		}
+		else {
+			throw "Было переданно неверное значение в параметр is_member_input. Ожидается 1 (true) / 0 (false).";
+		}
+	}
+
+	void SetStudentName(string student_name) {
+		if (!student_name.empty()) {
+			this->student_name = student_name; // TODO - Add more checks to setter.
+		}
+		else {
+			throw "Было переданно неверное значение в параметр student_name. Ожидается непустая строка.";
+		}
+	}
+
+	void SetLearningProgram(string learning_program) {
+		if (!learning_program.empty()) {
+			this->learning_program = learning_program; // TODO - Add more checks to setter.
+		}
+		else {
+			throw "Было переданно неверное значение в параметр learning_program. Ожидается непустая строка.";
+		}
+	}
+
+	/// <summary>
+	/// Setter for student_balance variable. Generates exception if is_member == false / input value is not >= 0.
+	/// </summary>
+	/// <param name="student_balance">Student's current balance.</param>
+	void SetStudentBalance(unsigned int student_balance) {
+		if (this->is_member == true && student_balance >= 0) {
+			this->student_balance = student_balance;
+		}
+		else {
+			throw "Было переданно неверное значение в параметр student_input_balance. Ожидается целое число от 0.";
+		}
+	}
+
+	/// <summary>
+	/// Setter for cost_per_month variable. Generates exception if is_member == false / input value is not >= 0.
+	/// </summary>
+	/// <param name="cost_per_month">Learning program cost per month of studying.</param>
+	void SetCostPerMonth(unsigned int cost_per_month) {
+		if (this->is_member == true && cost_per_month >= 0) {
+			this->cost_per_month = cost_per_month;
+		}
+		else {
+			throw "Было переданно неверное значение в параметр cost_per_month_input. Ожидается целое число от 0 включительно.";
+		}
+	}
+
+	// Setters
+	// ///////
+	// Getters
+
+
+	static int GetStudentsCount() {
+		return students_count;
 	}
 	Date GetDateJoin() const {
 		return date_join;
 	}
 
 
-	void SetDateLeave(const Date& date_leave) {
-		this->date_leave = date_leave;
-	}
 	Date GetDateLeave() const {
 		return date_leave;
 	}
@@ -356,79 +555,29 @@ public:
 	int GetStudentAverateRate() const {
 		return average_rate;
 	}
-
-	void SetLeader(Student* leader) {
-		/*
-		if (Student* student = dynamic_cast<Student*>(leader)) {
-			cout << "студент либо его потомок";
-		}
-		else {
-			cout << "что-то другое по типу";
-		}
-		*/
-
-		this->leader = leader;
-	}
+	
 
 	Student* GetLeader() const {
 		return leader;
 	}
-
-
-	void SetIsMember(bool is_member) {
-		if (is_member == 1 || is_member == 0) {
-			this->is_member = is_member;
-		}
-		else {
-			throw "Было переданно неверное значение в параметр is_member_input. Ожидается 1 (true) / 0 (false).";
-		}
-	}
+	
 
 	bool GetIsMember() const {
 		return is_member;
 	}
 
 
-	void SetStudentName(string student_name) {
-		if (!student_name.empty()) {
-			this->student_name = student_name; // TODO - Add more checks to setter.
-		}
-		else {
-			throw "Было переданно неверное значение в параметр student_name. Ожидается непустая строка.";
-		}
-	}
+	
 
 	string GetStudentName() const {
 		return student_name;
 	}
-
-
-	void SetLearningProgram(string learning_program) {
-		if (!learning_program.empty()) {
-			this->learning_program = learning_program; // TODO - Add more checks to setter.
-		}
-		else {
-			throw "Было переданно неверное значение в параметр learning_program. Ожидается непустая строка.";
-		}
-	}
+	
 
 	string GetLearningProgram() const {
 		return learning_program;
 	}
-
-
-	/// <summary>
-	/// Setter for student_balance variable. Generates exception if is_member == false / input value is not >= 0.
-	/// </summary>
-	/// <param name="student_balance">Student's current balance.</param>
-	void SetStudentBalance(unsigned int student_balance) {
-		if (this->is_member == true && student_balance >= 0) {
-			this->student_balance = student_balance;
-		}
-		else {
-			throw "Было переданно неверное значение в параметр student_input_balance. Ожидается целое число от 0.";
-		}
-	}
+	
 
 	/// <summary>
 	/// Getter for student_balance variable.
@@ -471,20 +620,7 @@ public:
 		return balance[index];
 	}
 	*/
-
-
-	/// <summary>
-	/// Setter for cost_per_month variable. Generates exception if is_member == false / input value is not >= 0.
-	/// </summary>
-	/// <param name="cost_per_month">Learning program cost per month of studying.</param>
-	void SetCostPerMonth(unsigned int cost_per_month) {
-		if (this->is_member == true && cost_per_month >= 0) {
-			this->cost_per_month = cost_per_month;
-		}
-		else {
-			throw "Было переданно неверное значение в параметр cost_per_month_input. Ожидается целое число от 0 включительно.";
-		}
-	}
+	
 
 	/// <summary>
 	/// Getter for cost_per_month variable.
@@ -507,63 +643,6 @@ public:
 		cout << "}" << "\n";
 		cout << noboolalpha; // Printing 1 / 0
 	}
-
-
-	// TODO: Add setter/getter from Date class. SetDate and Print functions.
-	
-	
-	~Student() {
-		/*
-		if (name != nullptr) {
-			delete[] name;
-			name = nullptr;
-		}
-		*/
-		if (rates != nullptr) {
-			delete[] rates;
-			rates = nullptr;
-		}
-		students_count--;
-	}
-	
-	Student(Student& original) {
-		for (int rate : original.GetRates()) {
-			/*this->*/AddRate(rate);
-		}
-		// TODO: Uncomment once balance dynamic array is used.
-		//for (int balance_entry : original.GetBalance()) {
-		//	/*this->*/AddBalanceEntry(balance_entry);
-		//}
-		this->rates_count = original.rates_count;
-		this->balance_count = original.balance_count;
-		this->is_member = original.is_member;
-		this->student_name = original.student_name;
-		this->learning_program = original.learning_program;
-		this->student_balance = original.student_balance;
-		this->cost_per_month = original.cost_per_month;
-		students_count++;
-	}
-
-	bool operator > (/*const Fraction* this, */const Student& right) {
-		// this-> это как left. в глобальной функции
-		return (this->average_rate > right.average_rate);
-	}
-
-	bool operator < (/*const Fraction* this, */const Student& right) {
-		// this-> это как left. в глобальной функции
-		return !(this->average_rate > right.average_rate);
-	}
-
-	bool operator == (/*const Fraction* this, */const Student& right) {
-		// this-> это как left. в глобальной функции
-		return (this->average_rate == right.average_rate);
-	}
-
-	bool operator != (/*const Fraction* this, */const Student& right) {
-		// this-> это как left. в глобальной функции
-		return !(this->average_rate == right.average_rate);
-	}
-
 };
 int Student::students_count = 0;
 
@@ -577,6 +656,26 @@ int main()
 	today.SetDate(21, 10, 2024);
 	today.PrintDate();
 	
+	/*
+	cout << "\n" << today << "\n";
+	cin >> today;
+	cout << today;
+
+	cout << "\n";
+	*/
+	
+
+	Date today1;
+	Date today2;
+
+	today1.SetDate(11, 4, 2024);
+	today2.SetDate(10, 4, 2024);
+
+	int result = today1 - today2;
+	cout << "\n\n";
+	cout << result;
+	cout << "\n\n";
+
 	Student test;
 	Student test2;
 	// Student testleader;
@@ -621,6 +720,12 @@ int main()
 	Microwave test3;
 	test3.SetHasPower(true);
 	test3.PrintMicrowave();
+
+	Microwave test4;
+	cout << "\n" << test4 << "\n";
+	cin >> test4;
+	cout << "\n" << test4 << "\n";
+
 	/*
 	test2.SetHasPower(true);
 	test2.SetTimer(10);
