@@ -47,6 +47,51 @@ public:
 		return jdn_result;
 	}
 
+	/// <summary>
+	/// Returns date in JDN format.
+	/// </summary>
+	explicit operator int(/*const Fraction* this*/)
+	{
+		// Returns date in JDN format.
+		// cout << "Casting from Fraction to int\n";
+		int JDN = (1461 * (this->year + 4800 + (this->month - 14) / 12)) / 4 + (367 * (this->month - 2 - 12 * ((this->month - 14) / 12))) / 12 - (3 * ((this->year + 4900 + (this->month - 14) / 12) / 100)) / 4 + this->day - 32075;
+		return JDN;
+	}
+
+	/// <summary>
+	/// Returns date as string. Format: DD.MM.YYYY
+	/// </summary>
+	explicit operator string()
+	{
+		// cout << "Casting from Fraction to string\n";
+		return to_string(day) + "." + to_string(month) + "." + to_string(year);
+	}
+
+	/// <summary>
+	/// Returns Day, Month, Year variables. 0 - Day, 1 - Month, >1 - Year.
+	/// </summary>
+	/// <param name="index">Index value to return Day, Month, Year (0, 1, >1).</param>
+	/// <returns>Day, Month, Year variable.</returns>
+	int operator [] (unsigned int index)
+	{
+		// cout << "Operator []\n";
+		if (index == 0) return GetDay();
+		else if (index == 1) return GetMonth();
+		else return GetYear();
+	}
+
+	/// <summary>
+	/// Setting day, month, year variables.
+	/// </summary>
+	/// <param name="day">Type: unsigned short day</param>
+	/// <param name="month">Type: unsigned short month</param>
+	/// <param name="year">Type: int year</param>
+	void operator () (unsigned short day, unsigned short month, int year) {
+		SetDay(day);
+		SetMonth(month);
+		SetYear(year);
+	}
+
 
 	void SetDay(unsigned short d) {
 		if (d >= 1 && d <= 31) {
@@ -116,7 +161,7 @@ istream& operator >> (istream& is, Date& date);
 
 ostream& operator << (ostream& os, const Date& date)
 {
-	os << date.GetDay() << "/" << date.GetMonth() << "/" << date.GetYear();
+	date.PrintDate();
 	return os;
 }
 
@@ -278,7 +323,7 @@ public:
 		// item_inside = ""; // Optional
 	}
 
-	void PrintMicrowave() {
+	void PrintMicrowave() const {
 		printf("\nMicrowave has power: %s\n", has_power ? "true" : "false");
 		// printf("Item inside: %s\n", item_inside); // Doesn't work
 		cout << "Item inside: " << item_inside << "\n";
@@ -294,7 +339,7 @@ istream& operator >> (istream& is, Microwave& microwave);
 
 ostream& operator << (ostream& os, const Microwave& microwave)
 {
-	os << "pw: " << microwave.GetHasPower() << " " << "t: " << microwave.GetTimer() << " " << "st: " << microwave.GetButtonStart() << " " << "in: " << microwave.GetItems();
+	microwave.PrintMicrowave();
 	return os;
 }
 
@@ -380,7 +425,7 @@ public:
 		students_count--;
 	}
 
-	Student(Student& original) {
+	Student(const Student& original) {
 		for (int rate : original.GetRates()) {
 			/*this->*/AddRate(rate);
 		}
@@ -396,6 +441,14 @@ public:
 		this->student_balance = original.student_balance;
 		this->cost_per_month = original.cost_per_month;
 		students_count++;
+	}
+
+	Student& operator = (/*const Student* this, */const Student& original) {
+		if (this == &original) {
+			return *this;
+		}
+		Student::~Student();
+		Student::Student(original);
 	}
 
 	bool operator > (/*const Fraction* this, */const Student& right) {
@@ -498,22 +551,8 @@ public:
 	}
 
 	// Setters
-	// ///////
-	// Getters
-
-
-	static int GetStudentsCount() {
-		return students_count;
-	}
-	Date GetDateJoin() const {
-		return date_join;
-	}
-
-
-	Date GetDateLeave() const {
-		return date_leave;
-	}
-
+	// /////// /////// ///////
+	// Getters / Adders / Print
 
 	void AddRate(int rate) {
 		if (rate < 1 || rate > 12) throw "Incorrect value (1-12 expected).";
@@ -538,6 +577,7 @@ public:
 
 	}
 
+
 	vector<int> GetRates() const {
 		vector<int> temp;
 		for (int i = 0; i < rates_count; i++)
@@ -547,11 +587,28 @@ public:
 		return temp;
 	}
 
+
+	static int GetStudentsCount() {
+		return students_count;
+	}
+
+
+	Date GetDateJoin() const {
+		return date_join;
+	}
+
+
+	Date GetDateLeave() const {
+		return date_leave;
+	}
+
+
 	int GetRateByIndex(unsigned int index) {
 		if (index >= rates_count) throw "Incorrect index!\n";
 		return rates[index];
 	}
 	
+
 	int GetStudentAverateRate() const {
 		return average_rate;
 	}
@@ -566,8 +623,6 @@ public:
 		return is_member;
 	}
 
-
-	
 
 	string GetStudentName() const {
 		return student_name;
@@ -646,6 +701,29 @@ public:
 };
 int Student::students_count = 0;
 
+ostream& operator << (ostream& os, const Student& student);
+istream& operator >> (istream& is, Student& student);
+
+ostream& operator << (ostream& os, const Student& student)
+{
+	
+
+
+}
+
+istream& operator >> (istream& is, Student& student)
+{
+	/*
+	bool is_member = true;
+	string student_name;
+	string learning_program;
+	unsigned int student_balance = 0;
+	unsigned int cost_per_month = 0;
+	*/
+
+
+	return is;
+}
 
 
 int main()
@@ -676,8 +754,11 @@ int main()
 	cout << result;
 	cout << "\n\n";
 
+	cout << today1;
+
 	Student test;
 	Student test2;
+	test2 = test;
 	// Student testleader;
 	// testleader.SetStudentName("Vlad");
 	// Student* ptrleader = &testleader;
@@ -720,11 +801,15 @@ int main()
 	Microwave test3;
 	test3.SetHasPower(true);
 	test3.PrintMicrowave();
+	cout << test3;
 
 	Microwave test4;
+	/*
 	cout << "\n" << test4 << "\n";
 	cin >> test4;
 	cout << "\n" << test4 << "\n";
+	*/
+	
 
 	/*
 	test2.SetHasPower(true);
