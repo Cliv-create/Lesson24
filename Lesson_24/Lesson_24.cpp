@@ -220,6 +220,12 @@ public:
 		microwave_count--;
 	}
 
+	explicit operator string()
+	{
+		// cout << "Casting from Fraction to string\n";
+		return "has_power: " + to_string(has_power) + " " + "button_start: " + to_string(button_start) + " " + "timer_seconds: " + to_string(timer_seconds) + " " + "item_inside: " + item_inside;
+	}
+
 
 	/// <summary>
 	/// Setter for has_power (bool) value. Throws exception.
@@ -367,7 +373,7 @@ class Student {
 private:
 	static int students_count;
 	int* rates = nullptr;
-	int rates_count = 0;
+	unsigned int rates_count = 0;
 	int* balance = 0;
 	int balance_count = 0;
 	Student* leader = nullptr;
@@ -469,6 +475,18 @@ public:
 	bool operator != (/*const Fraction* this, */const Student& right) {
 		// this-> это как left. в глобальной функции
 		return !(this->average_rate == right.average_rate);
+	}
+
+	explicit operator string()
+	{
+		/*
+		name
+		is_member
+		balance
+		program
+		group leader
+		*/
+		return "student_name: " + student_name + " " + "is_member: " + to_string(is_member) + " " + "student_balance: " + to_string(student_balance) + " " + "learning_program: " + learning_program;
 	}
 
 
@@ -706,22 +724,32 @@ istream& operator >> (istream& is, Student& student);
 
 ostream& operator << (ostream& os, const Student& student)
 {
-	
-
-
+	student.PrintStudent();
+	return os;
 }
 
 istream& operator >> (istream& is, Student& student)
 {
-	/*
 	bool is_member = true;
 	string student_name;
 	string learning_program;
 	unsigned int student_balance = 0;
 	unsigned int cost_per_month = 0;
-	*/
-
-
+	cout << "Enter is_member: ";
+	cin >> is_member;
+	cout << "\n" << "Enter student name: ";
+	cin >> student_name;
+	cout << "\n" << "Enter learning program: ";
+	cin >> learning_program;
+	cout << "\n" << "Enter student balance: ";
+	cin >> student_balance;
+	cout << "\n" << "Enter student cost_per_month: ";
+	cin >> cost_per_month;
+	student.SetIsMember(is_member);
+	student.SetStudentName(student_name);
+	student.SetLearningProgram(learning_program);
+	student.SetStudentBalance(student_balance);
+	student.SetCostPerMonth(cost_per_month);
 	return is;
 }
 
@@ -804,6 +832,9 @@ int main()
 	cout << test3;
 
 	Microwave test4;
+
+	string result5 = (string)test4;
+	cout << result5;
 	/*
 	cout << "\n" << test4 << "\n";
 	cin >> test4;
@@ -817,9 +848,4 @@ int main()
 	test2.SetItems("Tasty meal");
 	test2.SetButtonStart(true);
 	*/
-	
-	// test.date_join.
-	// В таком случае пользователь может сам выставить параметры даты.
-	// А нам это может быть НЕ НУЖНО. Вдруг он выставит другую дату, ниже предыдущей?
-	// С другой стороны пользователь это программист и он сам должен продумать взаимодействие с классом и кто может его менять
 }
